@@ -117,7 +117,12 @@ def counts_for(day, args, rng):
         low, high = args.per_day_range
         if low >= high:
             return low
-        count = int(round(low * (high / low) ** rng.random()))
+        if args.dist == "log":
+            count = int(round(low * (high / low) ** rng.random()))
+        else:
+            # 三角分布（两个均匀数相加再折半）：中间多、两头少，
+            # 这样 GitHub 的四分位会均匀散到四档，格子颜色不会全挤在一档
+            count = int(round(low + (high - low) * (rng.random() + rng.random()) / 2))
         if day.weekday() >= 5:
             count = int(count * args.weekend_scale)
         return max(low, count)
@@ -172,6 +177,12 @@ def main():
     )
     parser.add_argument("--per-day-min", type=int, default=0, help="每天提交量下限")
     parser.add_argument("--per-day-max", type=int, default=0, help="每天提交量上限")
+    parser.add_argument(
+        "--dist",
+        choices=("tri", "log"),
+        default="tri",
+        help="每天提交量的分布：tri=三角（默认，四档更均匀）/ log=对数均匀（多数日子少）",
+    )
     parser.add_argument("--weekend-scale", type=float, default=0.5, help="周末提交量折扣，默认 0.5")
     parser.add_argument("--skip-weekends", action="store_true", help="跳过周六周日")
     parser.add_argument("--hour", type=int, default=12, help="提交时间的小时（UTC），默认 12")
