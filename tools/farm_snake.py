@@ -180,8 +180,8 @@ def main():
     parser.add_argument(
         "--dist",
         choices=("tri", "log"),
-        default="tri",
-        help="每天提交量的分布：tri=三角（默认，四档更均匀）/ log=对数均匀（多数日子少）",
+        default="log",
+        help="每天提交量的分布：log=对数均匀（默认，多数日子少、偶尔多）/ tri=三角",
     )
     parser.add_argument("--weekend-scale", type=float, default=0.5, help="周末提交量折扣，默认 0.5")
     parser.add_argument("--skip-weekends", action="store_true", help="跳过周六周日")
